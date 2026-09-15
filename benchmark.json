@@ -1,28 +1,86 @@
 {
   "schemaVersion": 2,
-  "name": "proximity-prize",
+  "name": "binary-proximity-prize",
   "tracks": [
     {
-      "name": "irs-reduction-threshold-lower",
-      "description": "Maximise the kernel-checked induced spot-check-bit floor at a certified-safe IRS reduction radius.",
+      "name": "binary-half-lower",
+      "description": "Maximize a certified lower bound on fixed-query security bits at the 2^-128 reduction threshold",
       "category": "lean",
       "direction": "+",
-      "editablePaths": ["ProximityPrize/SubmissionLower"],
-      "setupCommand": ["bash", "-lc", "./setup.sh"],
-      "benchmarkCommand": ["bash", "-lc", "./benchmark.sh lower"],
-      "scorePath": ".yukon/irs-reduction-threshold-lower-score.json",
-      "runner": {"provider": "github-actions", "workflow": "benchmark-irs-reduction-threshold-lower.yml"}
+      "editablePaths": [
+        "ProximityPrize/SubmissionHalfLower"
+      ],
+      "setupCommand": [
+        "bash",
+        "-lc",
+        "./setup.sh --verifier"
+      ],
+      "benchmarkCommand": [
+        "bash",
+        "-lc",
+        "./benchmark.sh half-lower"
+      ],
+      "scorePath": ".yukon/binary-half-lower-score.json"
     },
     {
-      "name": "irs-reduction-threshold-upper",
-      "description": "Minimise the kernel-checked induced spot-check-bit ceiling at a winning-set-unsafe IRS radius.",
+      "name": "binary-half-upper",
+      "description": "Minimize a combinatorial upper bound on fixed-query security bits at the 2^-128 reduction threshold",
       "category": "lean",
       "direction": "-",
-      "editablePaths": ["ProximityPrize/SubmissionUpper"],
-      "setupCommand": ["bash", "-lc", "./setup.sh"],
-      "benchmarkCommand": ["bash", "-lc", "./benchmark.sh upper"],
-      "scorePath": ".yukon/irs-reduction-threshold-upper-score.json",
-      "runner": {"provider": "github-actions", "workflow": "benchmark-irs-reduction-threshold-upper.yml"}
+      "editablePaths": [
+        "ProximityPrize/SubmissionHalfUpper"
+      ],
+      "setupCommand": [
+        "bash",
+        "-lc",
+        "./setup.sh --verifier"
+      ],
+      "benchmarkCommand": [
+        "bash",
+        "-lc",
+        "./benchmark.sh half-upper"
+      ],
+      "scorePath": ".yukon/binary-half-upper-score.json"
+    },
+    {
+      "name": "binary-quarter-lower",
+      "description": "Maximize a certified lower bound on fixed-query security bits at the 2^-128 reduction threshold",
+      "category": "lean",
+      "direction": "+",
+      "editablePaths": [
+        "ProximityPrize/SubmissionQuarterLower"
+      ],
+      "setupCommand": [
+        "bash",
+        "-lc",
+        "./setup.sh --verifier"
+      ],
+      "benchmarkCommand": [
+        "bash",
+        "-lc",
+        "./benchmark.sh quarter-lower"
+      ],
+      "scorePath": ".yukon/binary-quarter-lower-score.json"
+    },
+    {
+      "name": "binary-quarter-upper",
+      "description": "Minimize a combinatorial upper bound on fixed-query security bits at the 2^-128 reduction threshold",
+      "category": "lean",
+      "direction": "-",
+      "editablePaths": [
+        "ProximityPrize/SubmissionQuarterUpper"
+      ],
+      "setupCommand": [
+        "bash",
+        "-lc",
+        "./setup.sh --verifier"
+      ],
+      "benchmarkCommand": [
+        "bash",
+        "-lc",
+        "./benchmark.sh quarter-upper"
+      ],
+      "scorePath": ".yukon/binary-quarter-upper-score.json"
     }
   ]
 }

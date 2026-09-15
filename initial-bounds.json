@@ -1,0 +1,46 @@
+{
+  "challengeFieldSize": "2^192",
+  "minimumWinningCount": "18446744073709551617",
+  "constructionBounds": [
+    {
+      "id": "half-prefix22-height3",
+      "rate": "half",
+      "domainLog": 22,
+      "height": 3,
+      "agreementPoints": 2228224,
+      "unsafeIndex": 1966080,
+      "badCountLower": "309713815690513207162378190204953014251248",
+      "formalizationStatus": "arithmetic-only; construction theorem not yet formalized",
+      "primaryProfile": true,
+      "centibitsUpper": 23361,
+      "repetitions": 256
+    },
+    {
+      "id": "quarter-prefix21-height3",
+      "rate": "quarter",
+      "domainLog": 21,
+      "height": 3,
+      "agreementPoints": 589824,
+      "unsafeIndex": 1507328,
+      "badCountLower": "2419492655753785641587358791347024615469",
+      "formalizationStatus": "arithmetic-only; construction theorem not yet formalized",
+      "primaryProfile": true,
+      "centibitsUpper": 23425,
+      "repetitions": 128
+    },
+    {
+      "id": "half-prefix23-height2",
+      "rate": "half",
+      "domainLog": 23,
+      "height": 2,
+      "agreementPoints": 4718592,
+      "unsafeIndex": 3670016,
+      "badCountLower": "24595617716531538599",
+      "formalizationStatus": "arithmetic-only; construction theorem not yet formalized",
+      "primaryProfile": false,
+      "centibitsUpper": 21250,
+      "repetitions": 256
+    }
+  ],
+  "reductionTarget": "2^-128"
+}

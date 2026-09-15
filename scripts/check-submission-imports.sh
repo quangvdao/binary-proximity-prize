@@ -9,20 +9,11 @@ fi
 profile="$1"
 submission_dir="$2"
 case "${profile}" in
-  lower)
-    submission_module="ProximityPrize.SubmissionLower."
-    target_module="ProximityPrize.Benchmark.TargetLower"
-    claim_file="radius.txt"
-    ;;
-  upper)
-    submission_module="ProximityPrize.SubmissionUpper."
-    target_module="ProximityPrize.Benchmark.TargetUpper"
-    claim_file="unsafe-index.txt"
-    ;;
-  *)
-    echo "unknown submission profile: ${profile}" >&2
-    exit 2
-    ;;
+  half-lower) submission_module="ProximityPrize.SubmissionHalfLower."; target_module="ProximityPrize.Benchmark.TargetLower"; claim_file="radius.txt" ;;
+  half-upper) submission_module="ProximityPrize.SubmissionHalfUpper."; target_module="ProximityPrize.Benchmark.TargetUpper"; claim_file="unsafe-index.txt" ;;
+  quarter-lower) submission_module="ProximityPrize.SubmissionQuarterLower."; target_module="ProximityPrize.Benchmark.QuarterTargetLower"; claim_file="radius.txt" ;;
+  quarter-upper) submission_module="ProximityPrize.SubmissionQuarterUpper."; target_module="ProximityPrize.Benchmark.QuarterTargetUpper"; claim_file="unsafe-index.txt" ;;
+  *) echo "unknown binary track: ${profile}" >&2; exit 2 ;;
 esac
 
 [[ -d "${submission_dir}" && ! -L "${submission_dir}" ]] || {

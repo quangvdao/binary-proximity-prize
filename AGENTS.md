@@ -1,181 +1,44 @@
-# Agent instructions
+# Binary proximity challenge
 
-When changing or preparing submissions for the reduction-threshold benchmarks:
+Work directly on main in this fork. Do not send submissions or requests to the
+upstream better.codes verifier. This is an independent sample challenge.
 
-1. Treat each challenge as self-contained. A lower submission may import only
-   `ProximityPrize.Benchmark.TargetLower` and modules in
-   `ProximityPrize.SubmissionLower`; an upper submission may import only
-   `ProximityPrize.Benchmark.TargetUpper` and modules in
-   `ProximityPrize.SubmissionUpper`. Never cross-import between challenges.
-   Ignore the umbrella `ProximityPrize.lean` when preparing a submission; do
-   not import `ProximityPrize`.
+## Mathematical contract
 
-   **`Mathlib`, `ArkLib` and `CompPoly` may be imported freely**, at any depth.
-2. Keep each submission root flat. Put `Solution.lean`, every helper `.lean`
-   file, `score.txt`, and the track-specific claim file directly in that root.
-   Subdirectories are not allowed.
-3. Stay inside the verifier's size limits. Both tracks admit at most **1000
-   files**, **8 MiB per file**, and **16 MiB across the whole submission root**.
-   The total is still the one to watch: it counts every admitted file together,
-   so several generated modules can exhaust it while each stays well inside the
-   per-file cap. Nothing in this repository enforces these — the submission is
-   refused at the fetch stage, before anything is compiled, and the claim is
-   not scored.
+The primary profiles are the exact LeanVM polynomial-prefix domains D22 at
+half rate and D21 at quarter rate over the 64-bit field, both with 192-bit
+challenges and 64 interleaving lanes; half rate uses 256 scoring queries and quarter rate uses 128. Preserve the distinction between base-valued initial
+sources and the unrestricted extension-valued sources in the main challenge.
+The upper contract requires an entire unsafe suffix, including the capacity
+endpoint; one MCA counterexample does not by itself discharge that contract.
 
-   These are the deployment's own ceilings, so treat them as fixed. There is
-   room here to spend deliberately: a value precomputed into a literal table
-   and looked up costs the kernel far less than the same value recomputed, and
-   lookup cost does not grow with the table, so trading source bytes for kernel
-   work is usually a good trade.
+Never relabel an arithmetic bound or a conditional theorem as a completed
+ProtocolClaim. Do not introduce sorry, new axioms, or native_decide into the
+protected profile or baseline proofs. Check the full axiom closure. Explicitly
+mark mathematical constructions whose Lean formalization remains incomplete.
+The root library and baselines must build without any contestant submission.
 
-   **Split generated tables into small per-row definitions.** This is the one
-   thing that decides whether a large table is usable at all. The cost is
-   superlinear in the size of a single definition and roughly linear in the
-   number of them, so a table filling the size budget elaborates in minutes when
-   split and does not finish at all as one definition. Shape matters far more
-   than size.
-4. Do not use the submission as an archive. Only `.lean` files plus `score.txt`
-   and the track claim file (`radius.txt` for lower, `unsafe-index.txt` for
-   upper) are admitted at all, and files that no import reaches still count
-   against every limit in rule 3.
+## Development
 
-   In particular, **do not copy library source into the submission**. Import it.
-   `Mathlib`, `ArkLib` and `CompPoly` are built ahead of time in the verifier
-   image, so an `import` loads a finished module, while a copied `.lean` file is
-   elaborated from scratch on every run, inside the same memory and time budgets
-   as your own proof.
-5. Stay inside the verifier's **memory** budget. Both tracks currently allow
-   **24 GiB** for the whole build. Exceeding it fails the submission without
-   scoring it, and reports `candidate_out_of_memory`.
+Use bounded independent agents for substantial proof changes, with disjoint
+file ownership. One agent owns Lake builds; do not concurrently rebuild shared
+dependency-cache entries. Respect the pinned Lake manifest and toolchain.
+Use LAKE_ARTIFACT_CACHE=false LAKE_NO_CACHE=true for builds in Documents/Lean.
 
-   `decide` and `native_decide` over a large finite computation are the usual
-   way to exceed it, and the cost is not visible in the source — a single
-   `decide` over a few hundred terms of large naturals can want tens of
-   gigabytes. Prefer a proof to an evaluation, and split a large `decide` into
-   lemmas the kernel can check separately.
+Keep only the challenge, reusable baseline material, and concise documentation.
+Old contest submissions belong in Git history, not another archive directory.
 
-   A `decide` never runs `simp`, so no lemma can make one cheaper — only the
-   definition it unfolds can. `submission-helpers/` holds an optional file you
-   may copy into your submission root for the case this bites hardest: a
-   `Finset.range` sum, which the kernel walks as a `List` where a `Nat`
-   recursion would be one addition. It is not part of the challenge; copy, edit
-   or ignore it.
+## Candidate validation
 
-   Before reaching for a bound, try closing the computation exactly. A sum whose
-   body is affine in the summation index has a closed form, and for a nested sum
-   closing just the inner one removes the whole inner traversal. That is the same
-   number, so it cannot lose a case, and every site that unfolded the definition
-   is repointed at the `_eq` lemma -- typically one `simp` argument or one `rw`
-   each.
+All four SubmissionHalf*/SubmissionQuarter* candidate roots start absent. Each candidate root must be
+flat and contain Solution.lean, score.txt, and radius.txt (lower) or
+unsafe-index.txt (upper). Imports may use the matching protected target,
+Mathlib, ArkLib, CompPoly, and helpers in the same candidate root. Cross-track
+imports and imports of the local Baselines namespace are not allowed.
+The textual import check is a preliminary filter; the Comparator validates
+exact declaration types and the permitted axiom closure. Its local results
+are diagnostics, not official leaderboard receipts.
 
-   Where the value cannot be closed, bound it. A `decide` that compares
-   something against a threshold does not need the value, only enough
-   to settle the comparison: if the goal is `cost < limit`, any `bound` with
-   `cost ≤ bound` settles it whenever `bound < limit`, and a closed-form bound
-   costs the kernel O(1) where the exact value costs O(n) or worse — times
-   however many instances the `decide` enumerates. Define the bounded predicate
-   separately and prove it implies the exact one, so the cases where the bound
-   is too loose keep the exact path and nothing is weakened. `KernelEval.lean`
-   has the worked pattern.
-
-   When a `decide` is slow, the definition it unfolds is the only lever, and
-   these are the parts of it that pay:
-
-   - **The arithmetic type.** The kernel evaluates `Nat` literals on an
-     accelerated path and `Int` on none. Where a test's sign is fixed in the
-     source — a non-negativity check on an affine expression, say — state it
-     over `ℕ` so the `Int` never gets built. Where the sign is genuinely
-     dynamic, leave it: carrying a sign and branching on it by hand costs more
-     than `Int`'s own representation.
-   - **Short-circuiting.** The `Decidable` instances for `∨` and `∧` stop at the
-     first decisive side, so the order of the operands is a real cost decision.
-     Put the cheap side that usually settles it first; the expensive side then
-     runs only where it must.
-   - **Instance dispatch, but only where it is dense.** Rewriting a `Prop` with
-     a `Decidable` instance as a `Bool` function pays where the `Prop` form
-     dispatches an instance per element — nested bounded quantifiers with
-     hypothesis guards. For a flat check over a short list it changes nothing.
-
-   - **How many points you evaluate.** A check over a range costs the range's
-     length. If the property is preserved between points where it holds, the
-     ends of an interval carry it, and a range split into runs costs the number
-     of runs rather than its size. The between-lemma is proved once about the
-     property, not once per interval. Likewise an interval sum is a difference
-     of two prefixes, so a closed form for the prefix answers every interval and
-     overlapping checks stop re-walking the shared part.
-   - **Whether your fast path fires.** A cheap test in front of an expensive one
-     only pays if it is usually true. If it is usually false you evaluate it
-     every time and take it never, which is the expensive path plus overhead.
-     Measure which branch actually decides before optimising either.
-
-   Two things that look like levers and are not. The kernel already shares
-   repeated subterms, so binding a repeated call to a `let` does not make a
-   `decide` cheaper. And grouping several `decide`s into one theorem over a
-   range costs the same as the separate ones, so batching is a packaging
-   choice, not a speed one.
-
-   Measure with `set_option profiler true` and `set_option Elab.async false`
-   rather than by timing the process: the import dominates a single file's wall
-   clock and drifts more between runs than the effect you are looking for.
-6. Stay inside the verifier's **time** budget. Both tracks currently allow
-   **4 hours** for the whole build, and a submission that runs past it is
-   failed unscored, exactly like the memory ceiling.
-
-   This repository's own benchmark job is capped at 6 hours, which is GitHub's
-   limit on a job rather than a number chosen here. It waits for a verifier slot
-   and then for the verification, so it has to cover both. Normally it does: a
-   queued submission brings up another host within about twenty minutes, which
-   leaves the full budget for the run itself.
-
-   What it does not cover is a saturated fleet. Autoscaling stops at three
-   hosts, so a fourth concurrent submission can wait behind a whole verification
-   and exceed the job ceiling. In that case only, a red benchmark can mean CI
-   ran out of time rather than the proof being at fault — check the submission's
-   own status before concluding anything from it.
-
-   Know what you are timing against. The fleet currently runs `r8i.xlarge`:
-   **4 vCPU**, 32 GiB, x86_64 at about 3.9 GHz. Your build gets four cores and
-   the memory budget in rule 5; the rest of the box is the host's.
-
-   Most development machines are wider than four cores, so a build that
-   parallelizes well locally does not keep that advantage here — and with
-   rule 7, a wide build costs memory without buying back time. Cap your own
-   build to four cores before reading a local wall clock against the 4 hours,
-   or the number will flatter the submission.
-
-   **Do not split modules to gain parallelism.** It is the obvious next idea
-   and it is a trap. Every module that builds concurrently loads the challenge's
-   import closure independently — about **3 GiB and five seconds each**, before
-   any of your own code — so concurrency multiplies the one cost you cannot
-   amortise. Modules of equal work chained together build in roughly the sum of
-   their parts; the same modules as independent siblings are never faster, and
-   can be several times slower, with wide variance between runs. Memory
-   bandwidth on import is the limit, and it binds sooner than the memory
-   ceiling does.
-
-   So rule 7's advice to have one heavy module import the next is about speed as
-   much as memory. A sequential chain is the right shape. If you want a build to
-   finish sooner, make the work smaller rather than wider.
-
-   One thing that *is* free: if you have `set_option Elab.async false` in your
-   sections, take it out unless you know you need it. Sequential elaboration is
-   rarely what you want, and turning it back on costs nothing to try.
-7. Stay inside the verifier's **disk** budget. The build writes to a **31.9 GiB**
-   filesystem of its own, and filling it fails the submission unscored and
-   reports `candidate_out_of_disk`.
-
-   What fills it is compiled output, so it is about the number of modules rather
-   than the cost of any one of them. It is a disk and not RAM, so that output
-   does not also count against the memory budget in rule 5.
-
-   Module count still reaches rule 5 by another route: every module built at
-   once loads the challenge's import closure, which is about 3 GiB before any of
-   your own code. A wide build is a memory cost even when each proof in it is
-   cheap. Importing one heavy module from the next makes them build in sequence
-   instead.
-
-Keep these rules aligned with `scripts/check-submission-imports.sh` and with
-the independent verifier's source policy, which is the authority: `source:` in
-the challenge manifest (`max_files`, `max_file_bytes`, `max_total_bytes`,
-`max_depth`, `allowed_suffixes`, `allowed_files`). If they ever disagree, the
-manifest wins and this file is stale.
+Do not restore hosted-verifier workflows, credentials, fleet assumptions, or
+upstream challenge identifiers. Local setup and optional Comparator setup are
+separate. Preserve the Apache license and upstream copyright notices.

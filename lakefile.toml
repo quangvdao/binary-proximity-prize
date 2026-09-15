@@ -1,4 +1,4 @@
-name = "proximity-prize"
+name = "binary-proximity-prize"
 defaultTargets = ["ProximityPrize"]
 
 [leanOptions]

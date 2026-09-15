@@ -14,8 +14,16 @@ from typing import Any
 MAX_CENTIBITS = 100_000
 MAX_FRACTION_COMPONENT = 2**63 - 1
 MIN_UNSAFE_INDEX = 1
-MAX_UNSAFE_INDEX = 131_072
-DOMAIN_SIZE = 2**18
+PROFILE_PARAMETERS = {
+    "half": {"domainSize": 2**22, "baseDimension": 2**21, "totalDimension": 2**27, "repetitions": 256},
+    "quarter": {"domainSize": 2**21, "baseDimension": 2**19, "totalDimension": 2**25, "repetitions": 128},
+}
+
+def split_track(track: str) -> tuple[str, str]:
+    if track not in {"half-lower", "half-upper", "quarter-lower", "quarter-upper"}:
+        raise ValueError(f"unknown binary track: {track}")
+    return tuple(track.split("-"))
+
 MAX_SCALAR_BYTES = 128
 MAX_RESULT_BYTES = 4 * 1024 * 1024
 FULL_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
@@ -46,8 +54,8 @@ def parse_json_nat(
     )
 
 
-def parse_centibits(raw: str, *, label: str = "score") -> int:
-    return parse_nat(raw, label=label, maximum=MAX_CENTIBITS)
+def parse_centibits(raw: str, *, label: str = "centibits") -> int:
+    return parse_nat(raw, label=label, minimum=0, maximum=MAX_CENTIBITS)
 
 
 def parse_radius(raw: str) -> tuple[int, int]:
@@ -71,12 +79,12 @@ def parse_radius(raw: str) -> tuple[int, int]:
     return numerator, denominator
 
 
-def parse_unsafe_index(raw: str, *, label: str = "unsafe index") -> int:
+def parse_unsafe_index(raw: str, *, profile: str = "half", label: str = "unsafe index") -> int:
     return parse_nat(
         raw,
         label=label,
         minimum=MIN_UNSAFE_INDEX,
-        maximum=MAX_UNSAFE_INDEX,
+        maximum=PROFILE_PARAMETERS[profile]["domainSize"] - PROFILE_PARAMETERS[profile]["baseDimension"],
     )
 
 

@@ -1,7 +1,0 @@
-{
-  "challenge_module": "ProximityPrize.Benchmark.Challenge",
-  "solution_module": "ProximityPrize.SubmissionLower.Solution",
-  "theorem_names": ["ProximityPrize.Benchmark.candidate"],
-  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
-  "enable_nanoda": false
-}

@@ -3,7 +3,7 @@ Copyright (c) 2026 Proximity Prize Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 
-import ProximityPrize.Benchmark.IRSProfile
+import ProximityPrize.Benchmark.QuarterRateProfile
 
 /-!
 # Lower challenge certificate for the ABF26 reduction threshold
@@ -11,7 +11,7 @@ import ProximityPrize.Benchmark.IRSProfile
 The fixed extractor-error target is `2^(-128)`. The interface certifies one
 admissible radius at which the executable IRS straight-line extractor's
 combination-round error bound is at most that target, then scores the induced
-spot-check error `(1 - δ)^t`, where `t = IRSProfile.repetitions = 256`.
+spot-check error `(1 - δ)^t`, where `t = QuarterRateProfile.repetitions = 128`.
 
 This extractor certificate is the MCA-plus-list term from ABF26 Lemma 6.10. It
 upper-bounds Definition 6.11's winning-set soundness, so the certificate also
@@ -19,7 +19,7 @@ establishes a conservative safe point for the exact combinatorial reduction
 error; equality is not assumed.
 -/
 
-namespace ProximityPrize.Benchmark
+namespace ProximityPrize.Benchmark.Quarter
 
 open ToyProblem
 open scoped NNReal
@@ -45,15 +45,15 @@ winning-set bound. `score` converts that radius to the spot-check term
 structure ProtocolClaim
     (centiBits radiusNumerator radiusDenominator : Nat) : Prop where
   admissible : claimedRadius radiusNumerator radiusDenominator ∈
-    Set.Ioo (0 : ℝ≥0) IRSProfile.minRelativeDistance
+    Set.Ioo (0 : ℝ≥0) QuarterRateProfile.minRelativeDistance
   reduction :
-    ToyProblem.Impl.IRS.certifiedGammaError IRSProfile.totalDimension
-        IRSProfile.interleaving IRSProfile.domain
+    ToyProblem.Impl.IRS.certifiedGammaError QuarterRateProfile.totalDimension
+        QuarterRateProfile.interleaving QuarterRateProfile.domain
         (claimedRadius radiusNumerator radiusDenominator) ≤
       reductionTarget
   score :
     (1 - claimedRadius radiusNumerator radiusDenominator) ^
-        IRSProfile.repetitions ≤
+        QuarterRateProfile.repetitions ≤
       claimedError centiBits
 
-end ProximityPrize.Benchmark
+end ProximityPrize.Benchmark.Quarter

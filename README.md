@@ -1,133 +1,77 @@
-# Proximity Prize — IRS reduction threshold
+# Binary proximity challenge
 
-This repository defines two Lean challenges around the ABF26 reduction-error
-threshold for one fixed interleaved Reed–Solomon profile. Each track includes
-an editable baseline candidate.
+A sample Lean competition for half-rate and quarter-rate Reed–Solomon codes on
+LeanVM's exact binary-field evaluation domains. Forked from
+[the Proximity Prize](https://github.com/proximity-prize/proximity-prize).
+All inherited contestant submissions have been removed.
 
-Let
+| Profile | Exact domain | RS dimension | Rate | Challenge field |
+|---|---|---:|---:|---|
+| Direct aggregation | D22, length 2^22 | 2^21 | 1/2 | GF(2^192) |
+| Recursion | D21, length 2^21 | 2^19 | 1/4 | GF(2^192) |
 
-```text
-epsilon* = 2^-128
-q(delta) = (1 - delta)^128
-b = B / 100
-```
+Both use 64 interleaving lanes. Half rate uses 256 scoring queries; quarter
+rate uses 128. At the asymptotic Johnson agreement, both choices give a
+128-bit query score. The base field is
+GF(2^64) with modulus X^64+X^4+X^3+X+1; the cubic extension has modulus
+Y^3+Y+1. D_d is the span of the first d powers of the base-field generator.
+The main challenge allows extension-valued sources.
 
-The score is the spot-check quantity induced by a certified threshold radius.
-It is not `-log2(WSS)` and is not a full-protocol security claim.
+There are four tracks: `half-lower`, `half-upper`, `quarter-lower`, and
+`quarter-upper`. Soundness entries maximize query bits at a certified safe
+radius. Combinatorial upper-bound entries minimize query bits at a certified unsafe suffix. The
+algebraic error target is always 2^-128; the query score is a separate quantity.
 
-## Challenges
+## Build and inspect
 
-| Track | Certificate | Score |
-|:--|:--|:--|
-| `irs-reduction-threshold-lower` | At `delta = P/Q`, `certifiedGammaError(delta) <= epsilon*` and `q(delta) <= 2^-b` | maximize `B` |
-| `irs-reduction-threshold-upper` | For every admissible `delta >= delta* = i/2^18`, `winningSetDensity(delta) > epsilon*`, and `2^-b <= q(delta*)` | minimize `B` |
-
-The lower certificate is
-`ProximityPrize.Benchmark.ProtocolClaim B P Q`. It uses ArkLib's certified
-combination-round error for the executable IRS straight-line extractor. Since
-ArkLib proves `winningSetDensity <= certifiedGammaError`, this is a
-conservative safe point.
-
-The upper certificate is
-`ProximityPrize.Benchmark.Upper.ProtocolClaimUpper B i`. It certifies an entire
-unsafe suffix because no monotonicity theorem for `winningSetDensity` is
-assumed. The index is verified metadata; the leaderboard compares `B` only.
-
-The protected definitions are in
-[`TargetLower.lean`](ProximityPrize/Benchmark/TargetLower.lean) and
-[`TargetUpper.lean`](ProximityPrize/Benchmark/TargetUpper.lean).
-
-## Included baselines
-
-| Track | Score | Claim metadata |
-|:--|--:|:--|
-| lower | `53.00` bits | radius `1/4` |
-| upper | `128.00` bits | unsafe index `131072`, hence radius `1/2` |
-
-These are editable starting points, not authoritative leaderboard results. The
-lower baseline certifies the extractor-error target at radius `1/4`; the upper
-baseline certifies that winning-set soundness exceeds the target throughout
-the required half-radius suffix.
-
-## Candidate layout
-
-Lower submissions use:
-
-```text
-ProximityPrize/SubmissionLower/
-  Solution.lean
-  score.txt          # canonical non-negative centibits B
-  radius.txt         # exact P/Q
-```
-
-and export:
-
-```lean
-theorem ProximityPrize.Benchmark.candidate :
-    ProximityPrize.Benchmark.ProtocolClaim B P Q := by
-  ...
-```
-
-Upper submissions use:
-
-```text
-ProximityPrize/SubmissionUpper/
-  Solution.lean
-  score.txt          # canonical non-negative centibits B
-  unsafe-index.txt   # i, from 1 through 131072
-```
-
-and export:
-
-```lean
-theorem ProximityPrize.Benchmark.Upper.candidate :
-    ProximityPrize.Benchmark.Upper.ProtocolClaimUpper B i := by
-  ...
-```
-
-Each challenge stands alone: a candidate may import only its own protected
-target and flat helper `.lean` files beside `Solution.lean` in the same
-submission root. Cross-challenge imports and subdirectories are rejected. The
-benchmark binds the scalar files to the exact theorem type and permits only
-`propext`, `Classical.choice`, and `Quot.sound` in the candidate's axiom
-closure.
-
-## Run
-
-Build the pinned verifier tools and protected targets:
+Install [elan](https://github.com/leanprover/elan), then run:
 
 ```sh
 ./setup.sh
 ```
 
-Then run the track whose submission root you created:
+This builds the pinned Lean library, checks the axiom closure, and reproduces
+the initial finite arithmetic. It does not build or submit contestant code.
+For an already initialized workspace:
 
 ```sh
-./benchmark.sh lower
-./benchmark.sh upper
+LAKE_ARTIFACT_CACHE=false LAKE_NO_CACHE=true lake build
+lake env lean scripts/check-axioms.lean
+python3 scripts/check-initial-bounds.py
+python3 scripts/test-contract.py
 ```
 
-On a machine without the trusted Linux sandbox, an explicitly unranked smoke
-test is available with `BENCHMARK_INSECURE_LOCAL=1`.
+The repository contains no `Submission*/Solution.lean` entries. Read
+[how to prepare a candidate](docs/submissions.md) to create one.
 
-Yukon exposes both score directions from [`benchmark.json`](benchmark.json):
+## Initial bounds
 
-```sh
-yukon switch irs-reduction-threshold-lower
-yukon run
+The baseline files distinguish unique-decoding lower certificates (106.24 bits
+at half rate and 86.79 bits at quarter rate) from numerical support
+for upper constructions. See [the exact proof status](docs/initial-bounds.md).
 
-yukon switch irs-reduction-threshold-upper
-yukon run
-```
+| Profile | Mathematical upper target | Agreement | Lean status |
+|---|---:|---:|---|
+| Half D22 | 233.61 bits | 17/32 | Count/score arithmetic; construction proof pending |
+| Quarter D21 | 234.25 bits | 9/32 | Count/score arithmetic; construction proof pending |
+| Supplementary half D23 | 212.50 bits | 9/16 | Count/score arithmetic; no additional contest profile |
 
-Local artifacts are diagnostic only. Ranked results require the independent
-verifier to accept the exact commit and return the matching score plus exact
-radius or unsafe index. The repository-side identities are:
+These upper targets are not accepted submissions or full `ProtocolClaimUpper`
+proofs. A contestant must prove the support construction and the entire unsafe
+suffix, not just the numeric inequalities.
 
-```text
-proximity-prize-reduction-lower @ irs-reduction-threshold-v10
-proximity-prize-reduction-upper @ irs-reduction-threshold-v10
-```
+## Where to work
 
-Those verifier profiles must be registered before either workflow can issue an
-authoritative leaderboard score.
+- [Challenge specification](docs/challenge.md): fields, domains, scoring,
+  source alphabets, and exact track contracts.
+- [Initial bounds](docs/initial-bounds.md): support-tree construction,
+  half-rate lift, capacity endpoint, and formalization obligations.
+- `ProximityPrize/Benchmark/`: protected field, domain, profile, and targets.
+- `ProximityPrize/Baselines/`: reusable initial Lean results.
+- `initial-bounds.json`: exact finite construction targets.
+
+This fork has **no official better.codes verifier registration, leaderboard,
+or prize**. Optional local Comparator checks are diagnostics. The challenge
+is an algebraic research benchmark, not an end-to-end LeanVM attack claim.
+The existing `ProximityPrize` Lean namespace is retained for compatibility;
+all runner identifiers are specific to this binary sample.

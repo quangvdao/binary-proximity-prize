@@ -9,21 +9,21 @@ import ArkLib.Data.CodingTheory.ProximityGap.BCIKS20.AffineLines.UniqueDecoding
 import ArkLib.Data.CodingTheory.ProximityGap.GrandChallenges
 import ProximityPrize.Benchmark.BinaryDomain
 
-/-! # The half-rate binary interleaved-RS challenge profile -/
+/-! # The quarter-rate binary interleaved-RS challenge profile -/
 
-namespace ProximityPrize.Benchmark.IRSProfile
+namespace ProximityPrize.Benchmark.QuarterRateProfile
 
 open Code ToyProblem ToyProblem.Impl.IRS
 open scoped NNReal
 
 abbrev Field := BinaryField192.Field
-abbrev Index := BinaryDomain.Index 22
+abbrev Index := BinaryDomain.Index 21
 
-def totalDimension : Nat := 2 ^ 27
+def totalDimension : Nat := 2 ^ 25
 def interleaving : Nat := 64
-def baseDimension : Nat := 2 ^ 21
-def domainSize : Nat := 2 ^ 22
-def repetitions : Nat := 256
+def baseDimension : Nat := 2 ^ 19
+def domainSize : Nat := 2 ^ 21
+def repetitions : Nat := 128
 
 theorem card_index : Fintype.card Index = domainSize := by
   norm_num [Index, domainSize, BinaryDomain.card_index]
@@ -38,13 +38,13 @@ theorem totalDimension_div_interleaving :
 local instance : NeZero interleaving := ⟨by norm_num [interleaving]⟩
 local instance : NeZero baseDimension := ⟨by norm_num [baseDimension]⟩
 
-/-- The exact `D_22 = span_{GF(2)} {1,u,...,u^21}` domain. -/
-def domain : Index ↪ Field := BinaryDomain.domain 22 (by norm_num)
+/-- The exact `D_21 = span_{GF(2)} {1,u,...,u^20}` domain. -/
+def domain : Index ↪ Field := BinaryDomain.domain 21 (by norm_num)
 
 theorem domain_range :
     Set.range domain = CompPoly.Extension.Ext.ofBase ''
-      (BinaryDomain.subspace 22 : Set BinaryField64.Field) :=
-  BinaryDomain.range_domain 22 (by norm_num)
+      (BinaryDomain.subspace 21 : Set BinaryField64.Field) :=
+  BinaryDomain.range_domain 21 (by norm_num)
 
 def encoder :
     (Fin totalDimension → Field) →ₗ[Field]
@@ -74,7 +74,7 @@ theorem dimension : Module.finrank Field code = totalDimension := by
       rw [card_index]
       norm_num [totalDimension, interleaving, domainSize])
 
-theorem alphabetRate : (LinearCode.alphabetRate code : ℝ) = 1 / 2 := by
+theorem alphabetRate : (LinearCode.alphabetRate code : ℝ) = 1 / 4 := by
   unfold code
   rw [ReedSolomon.Interleaved.alphabetRate_irsCode domain totalDimension
     interleaving (by
@@ -85,7 +85,7 @@ theorem alphabetRate : (LinearCode.alphabetRate code : ℝ) = 1 / 2 := by
 
 set_option maxRecDepth 20000 in
 theorem minDistance :
-    Code.minDist (code : Set (Index → Fin interleaving → Field)) = 2097153 := by
+    Code.minDist (code : Set (Index → Fin interleaving → Field)) = 1572865 := by
   unfold code
   rw [ReedSolomon.Interleaved.minDist_irsCode domain totalDimension interleaving
     (by
@@ -94,13 +94,13 @@ theorem minDistance :
 
 set_option maxRecDepth 20000 in
 theorem baseMinDistance :
-    Code.minDist (baseCode : Set (Index → Field)) = 2097153 := by
+    Code.minDist (baseCode : Set (Index → Field)) = 1572865 := by
   unfold baseCode
   rw [ReedSolomon.minDist_eq_card_sub_min_add_1, card_index]
   norm_num [baseDimension, domainSize]
 
-/-- The exact relative distance `(2^21 + 1) / 2^22`. -/
-noncomputable def minRelativeDistance : ℝ≥0 := (2097153 : ℝ≥0) / 4194304
+/-- The exact relative distance `(3 * 2^19 + 1) / 2^21`. -/
+noncomputable def minRelativeDistance : ℝ≥0 := (1572865 : ℝ≥0) / 2097152
 
 theorem base_minRelativeDistance :
     (Code.minRelHammingDistCode (baseCode : Set (Index → Field)) : ℝ≥0) =
@@ -111,12 +111,12 @@ theorem base_minRelativeDistance :
   norm_num [domainSize] at hbridge
   have hQ :
       ((Code.minRelHammingDistCode (baseCode : Set (Index → Field)) : ℚ≥0) : ℚ) =
-        (((2097153 : ℚ≥0) / 4194304 : ℚ≥0) : ℚ) := by
+        (((1572865 : ℚ≥0) / 2097152 : ℚ≥0) : ℚ) := by
     rw [← hbridge]
     norm_num
   have hN :
       Code.minRelHammingDistCode (baseCode : Set (Index → Field)) =
-        (2097153 : ℚ≥0) / 4194304 := by
+        (1572865 : ℚ≥0) / 2097152 := by
     exact_mod_cast hQ
   unfold minRelativeDistance
   rw [hN]
@@ -133,13 +133,13 @@ theorem minRelativeDistance_eq :
   have hQ :
       ((Code.minRelHammingDistCode
         (code : Set (Index → Fin interleaving → Field)) : ℚ≥0) : ℚ) =
-        (((2097153 : ℚ≥0) / 4194304 : ℚ≥0) : ℚ) := by
+        (((1572865 : ℚ≥0) / 2097152 : ℚ≥0) : ℚ) := by
     rw [← hbridge]
     norm_num
   have hN :
       Code.minRelHammingDistCode
         (code : Set (Index → Fin interleaving → Field)) =
-          (2097153 : ℚ≥0) / 4194304 := by
+          (1572865 : ℚ≥0) / 2097152 := by
     exact_mod_cast hQ
   unfold minRelativeDistance
   rw [hN]
@@ -156,15 +156,15 @@ noncomputable def parameters :
   encoder_range := encoder_range
 
 def merkleOpeningEstimateBits : Nat :=
-  repetitions * (256 * 22 + 192 * interleaving)
+  repetitions * (256 * 21 + 192 * interleaving)
 
-theorem merkleOpeningEstimateBits_eq : merkleOpeningEstimateBits = 4587520 := by
+theorem merkleOpeningEstimateBits_eq : merkleOpeningEstimateBits = 2260992 := by
   norm_num [merkleOpeningEstimateBits, repetitions, interleaving]
 
 def merkleOpeningEstimateBytes : Nat := merkleOpeningEstimateBits / 8
 
-theorem merkleOpeningEstimateBytes_eq : merkleOpeningEstimateBytes = 573440 := by
+theorem merkleOpeningEstimateBytes_eq : merkleOpeningEstimateBytes = 282624 := by
   norm_num [merkleOpeningEstimateBytes, merkleOpeningEstimateBits,
     repetitions, interleaving]
 
-end ProximityPrize.Benchmark.IRSProfile
+end ProximityPrize.Benchmark.QuarterRateProfile

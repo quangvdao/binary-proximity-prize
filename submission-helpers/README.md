@@ -3,12 +3,12 @@
 Optional Lean files you may copy into your submission root. Nothing here is part
 of the challenge and nothing here is imported by any target: a file reaches the
 verifier only if you copy it in, at which point it is submission code like any
-other and counts against the file and byte budgets.
+other.
 
 ## `KernelEval.lean`
 
 Kernel-cheap equivalents for quantities `decide` would otherwise compute by
-enumerating a `Finset`. Mathlib-only, and the same file for both tracks.
+enumerating a `Finset`. Mathlib-only, and the same file for all four tracks.
 
 `by decide` hands the goal to the kernel, which discharges it by unfolding
 definitions and never runs `simp`. So no lemma can make a `decide` cheaper —
@@ -33,9 +33,10 @@ Copy the file beside `Solution.lean` in your submission root — not in a
 subdirectory, since the root is flat. Then:
 
 ```lean
-import ProximityPrize.SubmissionLower.KernelEval   -- or SubmissionUpper
+import ProximityPrize.SubmissionHalfLower.KernelEval
 open KernelEval
 ```
 
 The declarations are in the `KernelEval` namespace, so `open` it or qualify them
-as `KernelEval.sumRange`. No edit is needed for either track.
+as `KernelEval.sumRange`. Use the matching SubmissionHalfLower, SubmissionHalfUpper,
+SubmissionQuarterLower, or SubmissionQuarterUpper import prefix.

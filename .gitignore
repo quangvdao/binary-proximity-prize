@@ -8,3 +8,7 @@
 build.log
 __pycache__/
 *.pyc
+
+/ProximityPrize/Benchmark/QuarterChallenge.lean
+/ProximityPrize/Benchmark/QuarterChallengeUpper.lean
+/tmp/

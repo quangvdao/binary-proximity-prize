@@ -2,7 +2,7 @@
 Copyright (c) 2026 Proximity Prize Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import ProximityPrize.Benchmark.IRSProfile
+import ProximityPrize.Benchmark.QuarterRateProfile
 import Mathlib.Data.Nat.Choose.Central
 import Mathlib.Data.Set.PowersetCard
 
@@ -12,7 +12,7 @@ import Mathlib.Data.Set.PowersetCard
 The fixed winning-set target is `epsilonStar = 2^(-128)`. The interface
 certifies an unsafe-from-here radius `δstar` for Definition 6.11's worst-case
 winning-challenge density and is scored by the induced spot-check error
-`(1 - δstar)^t`, where `t = IRSProfile.repetitions = 256`.
+`(1 - δstar)^t`, where `t = QuarterRateProfile.repetitions = 128`.
 
 ABF26 identifies Definition 6.11's worst-case winning-set density with the
 soundness error of the Construction 6.9 reduction. ArkLib formalizes that
@@ -23,7 +23,7 @@ monotonicity theorem is assumed. This threshold certificate does not construct
 an end-to-end attacking prover.
 -/
 
-namespace ProximityPrize.Benchmark.Upper
+namespace ProximityPrize.Benchmark.Quarter.Upper
 
 open ToyProblem
 open scoped NNReal
@@ -34,7 +34,7 @@ noncomputable def epsilonStar : ℝ≥0 :=
 
 /-- The claimed unsafe radius is pinned to the code's meaningful `1/n` grid. -/
 noncomputable def claimedUnsafeRadius (unsafeIndex : Nat) : ℝ≥0 :=
-  ProximityGap.gridPt (ι := IRSProfile.Index) unsafeIndex
+  ProximityGap.gridPt (ι := QuarterRateProfile.Index) unsafeIndex
 
 /-- An upper certificate for the ABF26 reduction threshold.
 
@@ -43,12 +43,12 @@ fixed target from `δstar` onward. `score` converts that radius to
 `(1 - δstar)^t`. Smaller `centiBits` and `unsafeIndex` are stronger. -/
 structure ProtocolClaimUpper (centiBits unsafeIndex : Nat) : Prop where
   admissible : claimedUnsafeRadius unsafeIndex ∈
-    Set.Ioo (0 : ℝ≥0) IRSProfile.minRelativeDistance
+    Set.Ioo (0 : ℝ≥0) QuarterRateProfile.minRelativeDistance
   unsafeAbove : ∀ δ ∈ Set.Ico (claimedUnsafeRadius unsafeIndex)
-      IRSProfile.minRelativeDistance,
-    epsilonStar < winningSetDensity IRSProfile.encoder δ
+      QuarterRateProfile.minRelativeDistance,
+    epsilonStar < winningSetDensity QuarterRateProfile.encoder δ
   score :
     (2 : ℝ≥0) ^ (-((centiBits : ℝ) / 100)) ≤
-      (1 - claimedUnsafeRadius unsafeIndex) ^ IRSProfile.repetitions
+      (1 - claimedUnsafeRadius unsafeIndex) ^ QuarterRateProfile.repetitions
 
-end ProximityPrize.Benchmark.Upper
+end ProximityPrize.Benchmark.Quarter.Upper

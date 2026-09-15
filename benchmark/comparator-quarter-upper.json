@@ -1,0 +1,13 @@
+{
+  "challenge_module": "ProximityPrize.Benchmark.QuarterChallengeUpper",
+  "solution_module": "ProximityPrize.SubmissionQuarterUpper.Solution",
+  "theorem_names": [
+    "ProximityPrize.Benchmark.Quarter.Upper.candidate"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

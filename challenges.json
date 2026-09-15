@@ -1,14 +1,61 @@
 {
+  "name": "binary-proximity-prize",
+  "status": "sample-local-only",
+  "profiles": {
+    "half": {
+      "baseField": "GF(2^64)",
+      "challengeField": "GF(2^192)",
+      "baseModulus": "X^64+X^4+X^3+X+1",
+      "extensionModulus": "Y^3+Y+1",
+      "domain": "span_F2(1,u,...,u^21)",
+      "domainSize": 4194304,
+      "baseDimension": 2097152,
+      "interleaving": 64,
+      "totalDimension": 134217728,
+      "sourceAlphabet": "GF(2^192)",
+      "reductionTarget": "2^-128",
+      "repetitions": 256
+    },
+    "quarter": {
+      "baseField": "GF(2^64)",
+      "challengeField": "GF(2^192)",
+      "baseModulus": "X^64+X^4+X^3+X+1",
+      "extensionModulus": "Y^3+Y+1",
+      "domain": "span_F2(1,u,...,u^20)",
+      "domainSize": 2097152,
+      "baseDimension": 524288,
+      "interleaving": 64,
+      "totalDimension": 33554432,
+      "sourceAlphabet": "GF(2^192)",
+      "reductionTarget": "2^-128",
+      "repetitions": 128
+    }
+  },
   "challenges": [
     {
-      "slug": "proximity-prize-reduction-lower",
-      "version": "irs-reduction-threshold-v14",
-      "submission_root": "ProximityPrize/SubmissionLower"
+      "slug": "binary-proximity-half-lower",
+      "version": "binary-bit-score-v1",
+      "profile": "half",
+      "submission_root": "ProximityPrize/SubmissionHalfLower"
     },
     {
-      "slug": "proximity-prize-reduction-upper",
-      "version": "irs-reduction-threshold-v14",
-      "submission_root": "ProximityPrize/SubmissionUpper"
+      "slug": "binary-proximity-half-upper",
+      "version": "binary-bit-score-v1",
+      "profile": "half",
+      "submission_root": "ProximityPrize/SubmissionHalfUpper"
+    },
+    {
+      "slug": "binary-proximity-quarter-lower",
+      "version": "binary-bit-score-v1",
+      "profile": "quarter",
+      "submission_root": "ProximityPrize/SubmissionQuarterLower"
+    },
+    {
+      "slug": "binary-proximity-quarter-upper",
+      "version": "binary-bit-score-v1",
+      "profile": "quarter",
+      "submission_root": "ProximityPrize/SubmissionQuarterUpper"
     }
-  ]
+  ],
+  "scoring": "spot-check security bits at a fixed 2^-128 reduction threshold"
 }

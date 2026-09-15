@@ -1,120 +1,56 @@
 #!/usr/bin/env python3
-"""Write a local Yukon score after Comparator accepts either claim."""
-
+"""Record a local diagnostic only after benchmark.sh runs Comparator successfully."""
 from __future__ import annotations
-
 import sys
-
 from benchmark_contract import (
-    DOMAIN_SIZE,
-    arklib_revision,
-    atomic_write_json,
-    atomic_write_text,
-    parse_centibits,
-    parse_radius,
-    parse_unsafe_index,
-    submission_revision,
+    PROFILE_PARAMETERS, arklib_revision, atomic_write_json, atomic_write_text,
+    parse_centibits, parse_radius, parse_unsafe_index, split_track, submission_revision,
 )
-
 
 def main() -> None:
     if len(sys.argv) != 4:
-        raise SystemExit(
-            "usage: write-benchmark-score.py lower|upper CENTIBITS CLAIM"
-        )
-
-    profile, raw_score, claim = sys.argv[1:]
-    if profile not in {"lower", "upper"}:
-        raise SystemExit(f"unknown benchmark profile: {profile}")
+        raise SystemExit('usage: write-benchmark-score.py TRACK CENTIBITS CLAIM')
+    track, raw_score, claim = sys.argv[1:]
     try:
+        rate, side = split_track(track)
+        p = PROFILE_PARAMETERS[rate]
         centibits = parse_centibits(raw_score)
-        revision = arklib_revision()
-        submission = submission_revision()
-        bits = centibits / 100
-
-        common = {
-            "centibits": centibits,
-            "bits": bits,
-            "field": "KoalaBear^6",
-            "code": "interleaved-Reed-Solomon",
-            "totalDimension": 2**20,
-            "interleaving": 8,
-            "domainSize": DOMAIN_SIZE,
-            "baseDimension": 2**17,
-            "repetitions": 128,
-            "verified": False,
-            "locallyKernelChecked": True,
-            "independentVerified": False,
-            "verificationAuthority": "local-comparator-diagnostic",
-            "launchEligible": False,
-            "arklibRev": revision,
-            "submissionRev": submission,
-            "axioms": ["propext", "Classical.choice", "Quot.sound"],
-        }
-
-        if profile == "lower":
+        ns = 'ProximityPrize.Benchmark' + ('.Quarter' if rate == 'quarter' else '')
+        if side == 'lower':
             numerator, denominator = parse_radius(claim)
-            exact_radius = f"{numerator}/{denominator}"
-            track = "irs-reduction-threshold-lower"
-            metrics = common | {
-                "track": track,
-                "claimKind": "certified-extractor-error-safe-radius",
-                "direction": "induced-spot-check-bit-floor",
-                "metric": "threshold_spot_floor_centibits",
-                "radiusExact": exact_radius,
-                "radius": numerator / denominator,
-                "reductionErrorTarget": "2^-128",
-                "reductionQuantity": "ToyProblem.Impl.IRS.certifiedGammaError",
-                "winningSetRelation": (
-                    "certified extractor error upper-bounds winning-set soundness"
-                ),
-                "spotCheckExpression": "(1 - radius)^128",
-                "theorem": "ProximityPrize.Benchmark.candidate",
-            }
-            summary = (
-                "## Proximity Prize — IRS reduction-threshold lower bound\n\n"
-                f"- Induced spot-check-bit floor: **{bits:.2f} bits**\n"
-                f"- Exact safe radius: `{exact_radius}`\n"
-                "- Certified extractor-error target: `2^-128`\n"
-            )
+            radius = f'{numerator}/{denominator}'
+            kind = 'certified-bit-lower-bound'
         else:
-            unsafe_index = parse_unsafe_index(claim)
-            exact_radius = f"{unsafe_index}/{DOMAIN_SIZE}"
-            track = "irs-reduction-threshold-upper"
-            metrics = common | {
-                "track": track,
-                "claimKind": "winning-set-unsafe-suffix",
-                "direction": "induced-spot-check-bit-ceiling",
-                "metric": "threshold_spot_ceiling_centibits",
-                "unsafeIndex": unsafe_index,
-                "unsafeRadiusExact": exact_radius,
-                "unsafeRadius": unsafe_index / DOMAIN_SIZE,
-                "winningSetTarget": "2^-128",
-                "reductionQuantity": "ToyProblem.winningSetDensity",
-                "spotCheckExpression": "(1 - unsafeRadius)^128",
-                "theorem": "ProximityPrize.Benchmark.Upper.candidate",
-            }
-            summary = (
-                "## Proximity Prize — IRS reduction-threshold upper bound\n\n"
-                f"- Induced spot-check-bit ceiling: **{bits:.2f} bits**\n"
-                f"- Unsafe-from-here grid index: **{unsafe_index}**\n"
-                f"- Exact unsafe-from-here radius: `{exact_radius}`\n"
-                "- Winning-set target: `2^-128`\n"
-            )
+            numerator = parse_unsafe_index(claim, profile=rate)
+            denominator = p['domainSize']
+            radius = f'{numerator}/{denominator}'
+            kind = 'combinatorial-bit-upper-bound'
+            ns += '.Upper'
+        metrics = dict(p) | {
+            'track': 'binary-' + track, 'profile': rate,
+            'centibits': centibits, 'metric': 'security-bits',
+            'field': 'GF(2^192)', 'evaluationPointBaseField': 'GF(2^64)',
+            'sourceAlphabet': 'GF(2^192)', 'domain': 'LeanVM polynomial-basis prefix',
+            'code': 'interleaved-Reed-Solomon', 'interleaving': 64,
+            'claimKind': kind, 'radiusExact': radius,
+            'reductionTarget': '2^-128', 'errorExpression': 'a^repetitions',
+            'theorem': ns + '.candidate',
+            'verified': False, 'locallyKernelChecked': True,
+            'independentVerified': False, 'launchEligible': False,
+            'verificationAuthority': 'local-comparator-diagnostic',
+            'arklibRev': arklib_revision(), 'submissionRev': submission_revision(),
+            'axioms': ['propext', 'Classical.choice', 'Quot.sound'],
+        }
+        if side == 'upper': metrics['unsafeIndex'] = numerator
     except (OSError, ValueError) as error:
         raise SystemExit(str(error)) from error
+    atomic_write_json(f'.yukon/binary-{track}-score.json', {'score': centibits / 100, 'metrics': metrics})
+    atomic_write_text(f'benchmark-results/binary-{track}-summary.md',
+        f'# Binary {track} local diagnostic\n\n'
+        f'- Bit score: **{centibits / 100:.2f}**\n'
+        f'- Exact radius: `{radius}`\n'
+        f'- Profile: `{rate}`, N={p["domainSize"]}, K={p["baseDimension"]}, 64 lanes.\n'
+        '- Reduction-error threshold: `2^-128`.\n'
+        '- Official leaderboard receipt: **none**. This sample has no registered verifier service.\n')
 
-    atomic_write_json(
-        f".yukon/{track}-score.json", {"score": bits, "metrics": metrics}
-    )
-    summary += (
-        "- Leaderboard-authoritative: **no — independent verification required**\n"
-        f"- ArkLib: `{revision}`\n"
-        "- Profile: `k=2^20`, `s=8`, `n=2^18`, `t=128` over `KoalaBear^6`\n"
-        "- Axioms: `propext`, `Classical.choice`, `Quot.sound`\n"
-    )
-    atomic_write_text(f"benchmark-results/{track}-summary.md", summary)
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__': main()

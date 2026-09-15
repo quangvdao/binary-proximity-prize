@@ -6,29 +6,19 @@ cd "${root}"
 
 export PATH="${HOME}/.elan/bin:${PATH}"
 
-[[ "$#" -eq 1 ]] || { echo "usage: ./benchmark.sh lower|upper" >&2; exit 2; }
-
+[[ "$#" -eq 1 ]] || { echo "usage: ./benchmark.sh half-lower|half-upper|quarter-lower|quarter-upper" >&2; exit 2; }
 profile="$1"
+track="binary-${profile}"
 case "${profile}" in
-  lower)
-    track="irs-reduction-threshold-lower"
-    submission_dir="${root}/ProximityPrize/SubmissionLower"
-    challenge_path="${root}/ProximityPrize/Benchmark/Challenge.lean"
-    claim_path="${submission_dir}/radius.txt"
-    comparator_config="benchmark/comparator.json"
-    ;;
-  upper)
-    track="irs-reduction-threshold-upper"
-    submission_dir="${root}/ProximityPrize/SubmissionUpper"
-    challenge_path="${root}/ProximityPrize/Benchmark/ChallengeUpper.lean"
-    claim_path="${submission_dir}/unsafe-index.txt"
-    comparator_config="benchmark/comparator-upper.json"
-    ;;
-  *)
-    echo "unknown benchmark profile: ${profile}" >&2
-    exit 2
-    ;;
+  half-lower) submission_dir="${root}/ProximityPrize/SubmissionHalfLower"; module="Challenge"; claim_file="radius.txt" ;;
+  half-upper) submission_dir="${root}/ProximityPrize/SubmissionHalfUpper"; module="ChallengeUpper"; claim_file="unsafe-index.txt" ;;
+  quarter-lower) submission_dir="${root}/ProximityPrize/SubmissionQuarterLower"; module="QuarterChallenge"; claim_file="radius.txt" ;;
+  quarter-upper) submission_dir="${root}/ProximityPrize/SubmissionQuarterUpper"; module="QuarterChallengeUpper"; claim_file="unsafe-index.txt" ;;
+  *) echo "unknown binary track: ${profile}" >&2; exit 2 ;;
 esac
+challenge_path="${root}/ProximityPrize/Benchmark/${module}.lean"
+claim_path="${submission_dir}/${claim_file}"
+comparator_config="benchmark/comparator-${profile}.json"
 
 rm -f "${root}/.yukon/${track}-score.json" \
   "${root}/benchmark-results/${track}-summary.md"
@@ -47,7 +37,7 @@ python3 scripts/render-benchmark-challenge.py \
 trap 'rm -f "${challenge_path}"' EXIT
 
 [[ -x "${comparator_bin}" && -x "${lean4export_bin}" ]] || {
-  echo "benchmark tools are missing; run ./setup.sh first" >&2
+  echo "benchmark tools are missing; run ./setup.sh --verifier first" >&2
   exit 1
 }
 
@@ -55,7 +45,7 @@ export COMPARATOR_LEAN4EXPORT="${lean4export_bin}"
 
 if [[ "$(uname -s)" == Linux && "${BENCHMARK_INSECURE_LOCAL:-0}" != 1 ]]; then
   landrun_bin="${root}/.benchmark-tools/landrun/landrun"
-  [[ -x "${landrun_bin}" ]] || { echo "landrun is missing; run ./setup.sh first" >&2; exit 1; }
+  [[ -x "${landrun_bin}" ]] || { echo "landrun is missing; run ./setup.sh --verifier first" >&2; exit 1; }
   command -v systemd-run >/dev/null 2>&1 || { echo "systemd-run is required for a trusted local run" >&2; exit 1; }
   export COMPARATOR_LANDRUN="${landrun_bin}"
   systemd-run --user --wait --pipe \
