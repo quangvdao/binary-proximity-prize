@@ -11,7 +11,7 @@ import ProximityPrize.Benchmark.QuarterRateProfile
 The fixed extractor-error target is `2^(-128)`. The interface certifies one
 admissible radius at which the executable IRS straight-line extractor's
 combination-round error bound is at most that target, then scores the induced
-spot-check error `(1 - δ)^t`, where `t = QuarterRateProfile.repetitions = 128`.
+spot-check error `(1 - δ)^t`, where `t = QuarterRateProfile.repetitions = 64`.
 
 This extractor certificate is the MCA-plus-list term from ABF26 Lemma 6.10. It
 upper-bounds Definition 6.11's winning-set soundness, so the certificate also

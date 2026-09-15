@@ -14,7 +14,7 @@
       "totalDimension": 134217728,
       "sourceAlphabet": "GF(2^192)",
       "reductionTarget": "2^-128",
-      "repetitions": 256
+      "repetitions": 128
     },
     "quarter": {
       "baseField": "GF(2^64)",
@@ -28,7 +28,7 @@
       "totalDimension": 33554432,
       "sourceAlphabet": "GF(2^192)",
       "reductionTarget": "2^-128",
-      "repetitions": 128
+      "repetitions": 64
     }
   },
   "challenges": [

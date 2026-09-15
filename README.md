@@ -10,9 +10,9 @@ All inherited contestant submissions have been removed.
 | Direct aggregation | D22, length 2^22 | 2^21 | 1/2 | GF(2^192) |
 | Recursion | D21, length 2^21 | 2^19 | 1/4 | GF(2^192) |
 
-Both use 64 interleaving lanes. Half rate uses 256 scoring queries; quarter
-rate uses 128. At the asymptotic Johnson agreement, both choices give a
-128-bit query score. The base field is
+Both use 64 interleaving lanes. Half rate uses 128 scoring queries, matching
+the current better.codes challenge; quarter rate uses 64 so the two profiles
+have the same 64-bit Johnson reference score. The base field is
 GF(2^64) with modulus X^64+X^4+X^3+X+1; the cubic extension has modulus
 Y^3+Y+1. D_d is the span of the first d powers of the base-field generator.
 The main challenge allows extension-valued sources.
@@ -46,15 +46,15 @@ The repository contains no `Submission*/Solution.lean` entries. Read
 
 ## Initial bounds
 
-The baseline files distinguish unique-decoding lower certificates (106.24 bits
-at half rate and 86.79 bits at quarter rate) from numerical support
+The baseline files distinguish unique-decoding lower certificates (53.12 bits
+at half rate and 43.39 bits at quarter rate) from numerical support
 for upper constructions. See [the exact proof status](docs/initial-bounds.md).
 
 | Profile | Mathematical upper target | Agreement | Lean status |
 |---|---:|---:|---|
-| Half D22 | 233.61 bits | 17/32 | Count/score arithmetic; construction proof pending |
-| Quarter D21 | 234.25 bits | 9/32 | Count/score arithmetic; construction proof pending |
-| Supplementary half D23 | 212.50 bits | 9/16 | Count/score arithmetic; no additional contest profile |
+| Half D22 | 116.81 bits | 17/32 | Count/score arithmetic; construction proof pending |
+| Quarter D21 | 117.13 bits | 9/32 | Count/score arithmetic; construction proof pending |
+| Supplementary half D23 | 106.25 bits | 9/16 | Count/score arithmetic; no additional contest profile |
 
 These upper targets are not accepted submissions or full `ProtocolClaimUpper`
 proofs. A contestant must prove the support construction and the entire unsafe

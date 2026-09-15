@@ -12,7 +12,7 @@ import Mathlib.Data.Set.PowersetCard
 The fixed winning-set target is `epsilonStar = 2^(-128)`. The interface
 certifies an unsafe-from-here radius `δstar` for Definition 6.11's worst-case
 winning-challenge density and is scored by the induced spot-check error
-`(1 - δstar)^t`, where `t = QuarterRateProfile.repetitions = 128`.
+`(1 - δstar)^t`, where `t = QuarterRateProfile.repetitions = 64`.
 
 ABF26 identifies Definition 6.11's worst-case winning-set density with the
 soundness error of the Construction 6.9 reduction. ArkLib formalizes that

@@ -6,12 +6,12 @@ historical contestant entries.
 
 ## Initial lower certificates
 
-`Baselines/InitialLower.lean` proves `ProtocolClaim 10624 1 4` for half rate;
-`Baselines/QuarterInitialLower.lean` proves `ProtocolClaim 8679 3 8` for quarter
+`Baselines/InitialLower.lean` proves `ProtocolClaim 5312 1 4` for half rate;
+`Baselines/QuarterInitialLower.lean` proves `ProtocolClaim 4339 3 8` for quarter
 rate. These use unique decoding, bound the complete combination-round term by
 (N+1)/2^192, and separately certify the fixed-query score. They are reusable
-baseline theorems, not contestant submissions. The scores are 106.24 and 86.79
-bits; improving them toward and beyond 128 bits is part of the challenge.
+baseline theorems, not contestant submissions. The scores are 53.12 and 43.39
+bits; improving them toward the 64-bit Johnson marker is the first milestone.
 
 ## Construction targets
 
@@ -20,9 +20,9 @@ exact binary prefix domains. The source pairs are E-valued.
 
 | Profile | Agreement | Nonzero bad count (log2, approximate) | Bad-density bits | Attack score ceiling |
 |---|---:|---:|---:|---:|
-| Half D22 | 17/32 | 137.82999 | 54.17001 | 233.61 |
-| Quarter D21 | 9/32 | 130.82990 | 61.17010 | 234.25 |
-| Half D23, supplementary | 9/16 | 64.41504 | 127.58496 | 212.50 |
+| Half D22 | 17/32 | 137.82999 | 54.17001 | 116.81 |
+| Quarter D21 | 9/32 | 130.82990 | 61.17010 | 117.13 |
+| Half D23, supplementary | 9/16 | 64.41504 | 127.58496 | 106.25 |
 
 D23 is a supplementary parameter calculation, not a third registered profile.
 The exact integers are in [initial-bounds.json](../initial-bounds.json).

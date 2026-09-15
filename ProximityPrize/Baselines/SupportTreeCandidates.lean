@@ -13,8 +13,8 @@ after the degree-doubling multiplier lift from quarter rate to half rate.  It
 does **not** formalize the support construction, the multiplier lift, the
 collision-pooling theorem, or a `ProtocolClaimUpper`.  Accordingly, the three
 results below are numerical candidates rather than benchmark certificates.
-The spot-check inequalities use 256 queries for half rate and 128 queries for
-quarter rate.  They do not supply the missing winning-set suffix theorem.
+The spot-check inequalities use 128 queries for half rate and 64 queries for
+quarter rate. They do not supply the missing winning-set suffix theorem.
 
 For height `h`, the number of distinct half-supports on a `v`-dimensional
 binary active space is
@@ -79,8 +79,8 @@ def F0 : Nat := fixedBankCollisionBudget K m M0
 def badLabels : Nat := pooledNonzeroLabels N q K m M0
 def agreementNumerator : Nat := 17
 def agreementDenominator : Nat := 32
-def repetitions : Nat := 256
-def centiBits : Nat := 23361
+def repetitions : Nat := 128
+def centiBits : Nat := 11681
 def status : BoundaryStatus := .numericalCandidate
 
 set_option maxRecDepth 100000 in
@@ -116,39 +116,39 @@ theorem status_eq : status = .numericalCandidate := rfl
 
 set_option maxRecDepth 100000 in
 set_option exponentiation.threshold 100000 in
-theorem score_nat : (2 : Nat) ^ 104639 ≤ 17 ^ 25600 := by
+theorem score_nat : (2 : Nat) ^ 52319 ≤ 17 ^ 12800 := by
   decide
 
 theorem score :
     (2 : NNReal) ^ (-((centiBits : Real) / 100)) ≤
       ((agreementNumerator : NNReal) / agreementDenominator) ^ repetitions := by
-  have hnat : (2 : Nat) ^ 128000 ≤ 2 ^ centiBits * 17 ^ 25600 := by
+  have hnat : (2 : Nat) ^ 64000 ≤ 2 ^ centiBits * 17 ^ 12800 := by
     calc
-      (2 : Nat) ^ 128000 = 2 ^ centiBits * 2 ^ 104639 := by
+      (2 : Nat) ^ 64000 = 2 ^ centiBits * 2 ^ 52319 := by
         norm_num [centiBits, ← pow_add]
-      _ ≤ 2 ^ centiBits * 17 ^ 25600 := Nat.mul_le_mul_left _ score_nat
+      _ ≤ 2 ^ centiBits * 17 ^ 12800 := Nat.mul_le_mul_left _ score_nat
   have hbase :
-      ((2 : NNReal) ^ centiBits)⁻¹ ≤ ((17 : NNReal) / 32) ^ (25600 : Nat) := by
+      ((2 : NNReal) ^ centiBits)⁻¹ ≤ ((17 : NNReal) / 32) ^ (12800 : Nat) := by
     rw [div_pow, le_div_iff₀ (by positivity), inv_mul_eq_div,
       div_le_iff₀ (by positivity)]
     have hcast :
-        ((2 : Nat) ^ 128000 : NNReal) ≤
-          ((2 ^ centiBits * 17 ^ 25600 : Nat) : NNReal) := by
+        ((2 : Nat) ^ 64000 : NNReal) ≤
+          ((2 ^ centiBits * 17 ^ 12800 : Nat) : NNReal) := by
       exact_mod_cast hnat
     push_cast at hcast
-    have hden : (32 : NNReal) ^ (25600 : Nat) = 2 ^ (128000 : Nat) := by
+    have hden : (32 : NNReal) ^ (12800 : Nat) = 2 ^ (64000 : Nat) := by
       rw [show (32 : NNReal) = 2 ^ (5 : Nat) by norm_num, ← pow_mul]
     simpa [hden, mul_comm] using hcast
   have hstart :
       (2 : NNReal) ^ (-(centiBits : Real)) ≤
-        ((17 : NNReal) / 32) ^ ((25600 : Nat) : Real) := by
+        ((17 : NNReal) / 32) ^ ((12800 : Nat) : Real) := by
     rw [NNReal.rpow_neg, NNReal.rpow_natCast, NNReal.rpow_natCast]
     exact hbase
   have hmono := NNReal.rpow_le_rpow hstart (by norm_num : (0 : Real) ≤ 1 / 100)
   rw [← NNReal.rpow_mul, ← NNReal.rpow_mul] at hmono
   rw [show (-(centiBits : Real)) * (1 / 100) =
       -((centiBits : Real) / 100) by ring,
-    show ((25600 : Nat) : Real) * (1 / 100) = ((256 : Nat) : Real) by norm_num,
+    show ((12800 : Nat) : Real) * (1 / 100) = ((128 : Nat) : Real) by norm_num,
     NNReal.rpow_natCast] at hmono
   simpa [agreementNumerator, agreementDenominator, repetitions] using hmono
 
@@ -167,8 +167,8 @@ def F0 : Nat := fixedBankCollisionBudget K m M0
 def badLabels : Nat := pooledNonzeroLabels N q K m M0
 def agreementNumerator : Nat := 9
 def agreementDenominator : Nat := 16
-def repetitions : Nat := 256
-def centiBits : Nat := 21250
+def repetitions : Nat := 128
+def centiBits : Nat := 10625
 def status : BoundaryStatus := .numericalCandidate
 
 set_option maxRecDepth 100000 in
@@ -200,39 +200,39 @@ theorem status_eq : status = .numericalCandidate := rfl
 
 set_option maxRecDepth 100000 in
 set_option exponentiation.threshold 100000 in
-theorem score_nat : (2 : Nat) ^ 81150 ≤ 9 ^ 25600 := by
+theorem score_nat : (2 : Nat) ^ 40575 ≤ 9 ^ 12800 := by
   decide
 
 theorem score :
     (2 : NNReal) ^ (-((centiBits : Real) / 100)) ≤
       ((agreementNumerator : NNReal) / agreementDenominator) ^ repetitions := by
-  have hnat : (2 : Nat) ^ 102400 ≤ 2 ^ centiBits * 9 ^ 25600 := by
+  have hnat : (2 : Nat) ^ 51200 ≤ 2 ^ centiBits * 9 ^ 12800 := by
     calc
-      (2 : Nat) ^ 102400 = 2 ^ centiBits * 2 ^ 81150 := by
+      (2 : Nat) ^ 51200 = 2 ^ centiBits * 2 ^ 40575 := by
         norm_num [centiBits, ← pow_add]
-      _ ≤ 2 ^ centiBits * 9 ^ 25600 := Nat.mul_le_mul_left _ score_nat
+      _ ≤ 2 ^ centiBits * 9 ^ 12800 := Nat.mul_le_mul_left _ score_nat
   have hbase :
-      ((2 : NNReal) ^ centiBits)⁻¹ ≤ ((9 : NNReal) / 16) ^ (25600 : Nat) := by
+      ((2 : NNReal) ^ centiBits)⁻¹ ≤ ((9 : NNReal) / 16) ^ (12800 : Nat) := by
     rw [div_pow, le_div_iff₀ (by positivity), inv_mul_eq_div,
       div_le_iff₀ (by positivity)]
     have hcast :
-        ((2 : Nat) ^ 102400 : NNReal) ≤
-          ((2 ^ centiBits * 9 ^ 25600 : Nat) : NNReal) := by
+        ((2 : Nat) ^ 51200 : NNReal) ≤
+          ((2 ^ centiBits * 9 ^ 12800 : Nat) : NNReal) := by
       exact_mod_cast hnat
     push_cast at hcast
-    have hden : (16 : NNReal) ^ (25600 : Nat) = 2 ^ (102400 : Nat) := by
+    have hden : (16 : NNReal) ^ (12800 : Nat) = 2 ^ (51200 : Nat) := by
       rw [show (16 : NNReal) = 2 ^ (4 : Nat) by norm_num, ← pow_mul]
     simpa [hden, mul_comm] using hcast
   have hstart :
       (2 : NNReal) ^ (-(centiBits : Real)) ≤
-        ((9 : NNReal) / 16) ^ ((25600 : Nat) : Real) := by
+        ((9 : NNReal) / 16) ^ ((12800 : Nat) : Real) := by
     rw [NNReal.rpow_neg, NNReal.rpow_natCast, NNReal.rpow_natCast]
     exact hbase
   have hmono := NNReal.rpow_le_rpow hstart (by norm_num : (0 : Real) ≤ 1 / 100)
   rw [← NNReal.rpow_mul, ← NNReal.rpow_mul] at hmono
   rw [show (-(centiBits : Real)) * (1 / 100) =
       -((centiBits : Real) / 100) by ring,
-    show ((25600 : Nat) : Real) * (1 / 100) = ((256 : Nat) : Real) by norm_num,
+    show ((12800 : Nat) : Real) * (1 / 100) = ((128 : Nat) : Real) by norm_num,
     NNReal.rpow_natCast] at hmono
   simpa [agreementNumerator, agreementDenominator, repetitions] using hmono
 
@@ -252,8 +252,8 @@ def badLabels : Nat := pooledNonzeroLabels N q K m M0
 def agreementNumerator : Nat := 9
 def agreementDenominator : Nat := 32
 def unsafeIndex : Nat := 1507328
-def centiBits : Nat := 23425
-def repetitions : Nat := 128
+def centiBits : Nat := 11713
+def repetitions : Nat := 64
 def status : BoundaryStatus := .numericalCandidate
 
 set_option maxRecDepth 100000 in
@@ -293,40 +293,40 @@ theorem status_eq : status = .numericalCandidate := rfl
 
 set_option maxRecDepth 100000 in
 set_option exponentiation.threshold 100000 in
-theorem score_nat : (2 : Nat) ^ 40575 ≤ 9 ^ 12800 := by
+theorem score_nat : (2 : Nat) ^ 20287 ≤ 9 ^ 6400 := by
   decide
 
 theorem score :
     (2 : NNReal) ^ (-((centiBits : Real) / 100)) ≤
-      ((agreementNumerator : NNReal) / agreementDenominator) ^ (128 : Nat) := by
-  have hnat : (2 : Nat) ^ 64000 ≤ 2 ^ centiBits * 9 ^ 12800 := by
+      ((agreementNumerator : NNReal) / agreementDenominator) ^ (64 : Nat) := by
+  have hnat : (2 : Nat) ^ 32000 ≤ 2 ^ centiBits * 9 ^ 6400 := by
     calc
-      (2 : Nat) ^ 64000 = 2 ^ centiBits * 2 ^ 40575 := by
+      (2 : Nat) ^ 32000 = 2 ^ centiBits * 2 ^ 20287 := by
         norm_num [centiBits, ← pow_add]
-      _ ≤ 2 ^ centiBits * 9 ^ 12800 :=
+      _ ≤ 2 ^ centiBits * 9 ^ 6400 :=
         Nat.mul_le_mul_left _ score_nat
   have hbase :
-      ((2 : NNReal) ^ centiBits)⁻¹ ≤ ((9 : NNReal) / 32) ^ (12800 : Nat) := by
+      ((2 : NNReal) ^ centiBits)⁻¹ ≤ ((9 : NNReal) / 32) ^ (6400 : Nat) := by
     rw [div_pow, le_div_iff₀ (by positivity), inv_mul_eq_div,
       div_le_iff₀ (by positivity)]
     have hcast :
-        ((2 : Nat) ^ 64000 : NNReal) ≤
-          ((2 ^ centiBits * 9 ^ 12800 : Nat) : NNReal) := by
+        ((2 : Nat) ^ 32000 : NNReal) ≤
+          ((2 ^ centiBits * 9 ^ 6400 : Nat) : NNReal) := by
       exact_mod_cast hnat
     push_cast at hcast
-    have hden : (32 : NNReal) ^ (12800 : Nat) = 2 ^ (64000 : Nat) := by
+    have hden : (32 : NNReal) ^ (6400 : Nat) = 2 ^ (32000 : Nat) := by
       rw [show (32 : NNReal) = 2 ^ (5 : Nat) by norm_num, ← pow_mul]
     simpa [hden, mul_comm] using hcast
   have hstart :
       (2 : NNReal) ^ (-(centiBits : Real)) ≤
-        ((9 : NNReal) / 32) ^ ((12800 : Nat) : Real) := by
+        ((9 : NNReal) / 32) ^ ((6400 : Nat) : Real) := by
     rw [NNReal.rpow_neg, NNReal.rpow_natCast, NNReal.rpow_natCast]
     exact hbase
   have hmono := NNReal.rpow_le_rpow hstart (by norm_num : (0 : Real) ≤ 1 / 100)
   rw [← NNReal.rpow_mul, ← NNReal.rpow_mul] at hmono
   rw [show (-(centiBits : Real)) * (1 / 100) =
       -((centiBits : Real) / 100) by ring,
-    show ((12800 : Nat) : Real) * (1 / 100) = ((128 : Nat) : Real) by norm_num,
+    show ((6400 : Nat) : Real) * (1 / 100) = ((64 : Nat) : Real) by norm_num,
     NNReal.rpow_natCast] at hmono
   simpa [agreementNumerator, agreementDenominator, repetitions] using hmono
 

@@ -14,7 +14,7 @@ class ContractTests(unittest.TestCase):
         for rate,p in PROFILE_PARAMETERS.items():
             for key,value in p.items(): self.assertEqual(manifest['profiles'][rate][key],value)
     def test_score_contract(self):
-        self.assertEqual(parse_centibits('10624'),10624)
+        self.assertEqual(parse_centibits('5312'),5312)
         for value in ['-1','01','1.1','100001']:
             with self.assertRaises(ValueError): parse_centibits(value)
         manifest=json.loads((ROOT/'benchmark.json').read_text())

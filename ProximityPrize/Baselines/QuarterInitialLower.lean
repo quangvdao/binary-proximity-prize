@@ -10,8 +10,8 @@ import ProximityPrize.Baselines.UniqueDecoding
 # Initial quarter-rate lower certificate
 
 This is the axiom-clean unique-decoding baseline at radius `3/8`.  It bounds
-the complete MCA-plus-list combination-round error and certifies 86.79 bits
-for the profile's 128 spot checks.
+the complete MCA-plus-list combination-round error and certifies 43.39 bits
+for the profile's 64 spot checks.
 -/
 
 namespace ProximityPrize.Baselines.QuarterInitialLower
@@ -19,12 +19,12 @@ namespace ProximityPrize.Baselines.QuarterInitialLower
 open Code ProximityGap ToyProblem
 open scoped NNReal
 
-def centiBits : Nat := 8679
+def centiBits : Nat := 4339
 
 set_option maxRecDepth 100000 in
 set_option exponentiation.threshold 100000 in
 theorem score_nat :
-    (5 : Nat) ^ 12800 * 2 ^ centiBits ≤ 2 ^ 38400 := by
+    (5 : Nat) ^ 6400 * 2 ^ centiBits ≤ 2 ^ 19200 := by
   decide
 
 set_option maxRecDepth 100000 in
@@ -34,27 +34,27 @@ theorem score :
         ProximityPrize.Benchmark.QuarterRateProfile.repetitions ≤
       ProximityPrize.Benchmark.Quarter.claimedError centiBits := by
   have hbase :
-      ((5 : NNReal) / 8) ^ (12800 : Nat) ≤
+      ((5 : NNReal) / 8) ^ (6400 : Nat) ≤
         ((2 : NNReal) ^ centiBits)⁻¹ := by
     rw [div_pow, show ((2 : NNReal) ^ centiBits)⁻¹ =
       1 / (2 : NNReal) ^ centiBits by rw [one_div],
       div_le_div_iff₀ (by positivity) (by positivity)]
     have hcast :
-        (((5 : Nat) ^ 12800 * 2 ^ centiBits : Nat) : NNReal) ≤
-          ((2 : Nat) ^ 38400 : NNReal) := by
+        (((5 : Nat) ^ 6400 * 2 ^ centiBits : Nat) : NNReal) ≤
+          ((2 : Nat) ^ 19200 : NNReal) := by
       exact_mod_cast score_nat
     push_cast at hcast
-    have hden : (8 : NNReal) ^ (12800 : Nat) = 2 ^ (38400 : Nat) := by
+    have hden : (8 : NNReal) ^ (6400 : Nat) = 2 ^ (19200 : Nat) := by
       rw [show (8 : NNReal) = 2 ^ (3 : Nat) by norm_num, ← pow_mul]
     simpa [hden, mul_comm] using hcast
   have hstart :
-      ((5 : NNReal) / 8) ^ ((12800 : Nat) : Real) ≤
+      ((5 : NNReal) / 8) ^ ((6400 : Nat) : Real) ≤
         (2 : NNReal) ^ (-(centiBits : Real)) := by
     rw [NNReal.rpow_neg, NNReal.rpow_natCast, NNReal.rpow_natCast]
     exact hbase
   have hmono := NNReal.rpow_le_rpow hstart (by norm_num : (0 : Real) ≤ 1 / 100)
   rw [← NNReal.rpow_mul, ← NNReal.rpow_mul] at hmono
-  rw [show ((12800 : Nat) : Real) * (1 / 100) = ((128 : Nat) : Real) by norm_num,
+  rw [show ((6400 : Nat) : Real) * (1 / 100) = ((64 : Nat) : Real) by norm_num,
     show (-(centiBits : Real)) * (1 / 100) =
       -((centiBits : Real) / 100) by ring,
     NNReal.rpow_natCast] at hmono
@@ -148,7 +148,7 @@ theorem reduction :
       rw [div_le_div_iff₀ (by positivity) (by positivity)]
       norm_num [ProximityPrize.Benchmark.QuarterRateProfile.domainSize]
 
-/-- The initial quarter-rate benchmark certificate: 86.79 bits at radius `3/8`. -/
+/-- The initial quarter-rate benchmark certificate: 43.39 bits at radius `3/8`. -/
 theorem certificate :
     ProximityPrize.Benchmark.Quarter.ProtocolClaim centiBits 3 8 where
   admissible := by

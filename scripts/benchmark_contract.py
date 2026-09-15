@@ -15,8 +15,8 @@ MAX_CENTIBITS = 100_000
 MAX_FRACTION_COMPONENT = 2**63 - 1
 MIN_UNSAFE_INDEX = 1
 PROFILE_PARAMETERS = {
-    "half": {"domainSize": 2**22, "baseDimension": 2**21, "totalDimension": 2**27, "repetitions": 256},
-    "quarter": {"domainSize": 2**21, "baseDimension": 2**19, "totalDimension": 2**25, "repetitions": 128},
+    "half": {"domainSize": 2**22, "baseDimension": 2**21, "totalDimension": 2**27, "repetitions": 128},
+    "quarter": {"domainSize": 2**21, "baseDimension": 2**19, "totalDimension": 2**25, "repetitions": 64},
 }
 
 def split_track(track: str) -> tuple[str, str]:

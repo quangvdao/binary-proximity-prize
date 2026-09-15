@@ -7,7 +7,7 @@ upstream better.codes verifier. This is an independent sample challenge.
 
 The primary profiles are the exact LeanVM polynomial-prefix domains D22 at
 half rate and D21 at quarter rate over the 64-bit field, both with 192-bit
-challenges and 64 interleaving lanes; half rate uses 256 scoring queries and quarter rate uses 128. Preserve the distinction between base-valued initial
+challenges and 64 interleaving lanes; half rate uses 128 scoring queries and quarter rate uses 64. Preserve the distinction between base-valued initial
 sources and the unrestricted extension-valued sources in the main challenge.
 The upper contract requires an entire unsafe suffix, including the capacity
 endpoint; one MCA counterexample does not by itself discharge that contract.

@@ -10,8 +10,8 @@ import ProximityPrize.Baselines.UniqueDecoding
 # Initial half-rate lower certificate
 
 This is the axiom-clean unique-decoding baseline at radius `1/4`.  It bounds
-the complete MCA-plus-list combination-round error and certifies 106.24 bits
-for the profile's 256 spot checks.
+the complete MCA-plus-list combination-round error and certifies 53.12 bits
+for the profile's 128 spot checks.
 -/
 
 namespace ProximityPrize.Baselines.InitialLower
@@ -19,12 +19,12 @@ namespace ProximityPrize.Baselines.InitialLower
 open Code ProximityGap ToyProblem
 open scoped NNReal
 
-def centiBits : Nat := 10624
+def centiBits : Nat := 5312
 
 set_option maxRecDepth 100000 in
 set_option exponentiation.threshold 100000 in
 theorem score_nat :
-    (3 : Nat) ^ 25600 * 2 ^ centiBits ≤ 2 ^ 51200 := by
+    (3 : Nat) ^ 12800 * 2 ^ centiBits ≤ 2 ^ 25600 := by
   decide
 
 set_option maxRecDepth 100000 in
@@ -34,27 +34,27 @@ theorem score :
         ProximityPrize.Benchmark.IRSProfile.repetitions ≤
       ProximityPrize.Benchmark.claimedError centiBits := by
   have hbase :
-      ((3 : NNReal) / 4) ^ (25600 : Nat) ≤
+      ((3 : NNReal) / 4) ^ (12800 : Nat) ≤
         ((2 : NNReal) ^ centiBits)⁻¹ := by
     rw [div_pow, show ((2 : NNReal) ^ centiBits)⁻¹ =
       1 / (2 : NNReal) ^ centiBits by rw [one_div],
       div_le_div_iff₀ (by positivity) (by positivity)]
     have hcast :
-        (((3 : Nat) ^ 25600 * 2 ^ centiBits : Nat) : NNReal) ≤
-          ((2 : Nat) ^ 51200 : NNReal) := by
+        (((3 : Nat) ^ 12800 * 2 ^ centiBits : Nat) : NNReal) ≤
+          ((2 : Nat) ^ 25600 : NNReal) := by
       exact_mod_cast score_nat
     push_cast at hcast
-    have hden : (4 : NNReal) ^ (25600 : Nat) = 2 ^ (51200 : Nat) := by
+    have hden : (4 : NNReal) ^ (12800 : Nat) = 2 ^ (25600 : Nat) := by
       rw [show (4 : NNReal) = 2 ^ (2 : Nat) by norm_num, ← pow_mul]
     simpa [hden, mul_comm] using hcast
   have hstart :
-      ((3 : NNReal) / 4) ^ ((25600 : Nat) : Real) ≤
+      ((3 : NNReal) / 4) ^ ((12800 : Nat) : Real) ≤
         (2 : NNReal) ^ (-(centiBits : Real)) := by
     rw [NNReal.rpow_neg, NNReal.rpow_natCast, NNReal.rpow_natCast]
     exact hbase
   have hmono := NNReal.rpow_le_rpow hstart (by norm_num : (0 : Real) ≤ 1 / 100)
   rw [← NNReal.rpow_mul, ← NNReal.rpow_mul] at hmono
-  rw [show ((25600 : Nat) : Real) * (1 / 100) = ((256 : Nat) : Real) by norm_num,
+  rw [show ((12800 : Nat) : Real) * (1 / 100) = ((128 : Nat) : Real) by norm_num,
     show (-(centiBits : Real)) * (1 / 100) =
       -((centiBits : Real) / 100) by ring,
     NNReal.rpow_natCast] at hmono
@@ -145,7 +145,7 @@ theorem reduction :
       rw [div_le_div_iff₀ (by positivity) (by positivity)]
       norm_num [ProximityPrize.Benchmark.IRSProfile.domainSize]
 
-/-- The initial half-rate benchmark certificate: 106.24 bits at radius `1/4`. -/
+/-- The initial half-rate benchmark certificate: 53.12 bits at radius `1/4`. -/
 theorem certificate : ProximityPrize.Benchmark.ProtocolClaim centiBits 1 4 where
   admissible := by
     constructor <;>

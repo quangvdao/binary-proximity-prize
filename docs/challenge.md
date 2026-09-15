@@ -17,8 +17,8 @@ Both use LeanVM's field presentation:
 
 | Profile | Domain | N | K | Rate | Total message dimension | Scoring queries |
 |---|---|---:|---:|---:|---:|---:|
-| Half | D22 | 2^22 | 2^21 | 1/2 | 2^27 | 256 |
-| Quarter | D21 | 2^21 | 2^19 | 1/4 | 2^25 | 128 |
+| Half | D22 | 2^22 | 2^21 | 1/2 | 2^27 | 128 |
+| Quarter | D21 | 2^21 | 2^19 | 1/4 | 2^25 | 64 |
 
 The half-rate size corresponds to the current direct 900-XMSS benchmark; the
 quarter-rate size corresponds to its 2-to-1 recursion benchmark. These sizes
@@ -28,12 +28,15 @@ possible LeanVM workload. The source snapshot is
 [leanVM b7a10725](https://github.com/leanEthereum/leanVM/tree/b7a1072565e17a222e31924ff96f79a8e5cab458),
 with [benchmarks](https://github.com/leanEthereum/leanVM/blob/b7a1072565e17a222e31924ff96f79a8e5cab458/README.md)
 and [configuration](https://github.com/leanEthereum/leanVM/blob/b7a1072565e17a222e31924ff96f79a8e5cab458/crates/pcs/src/whir_config.rs).
-These fixed scoring query counts are a contest convention, not LeanVM's query schedule.
+The half-rate count matches the current better.codes challenge. The quarter-rate
+count is halved so its Johnson and capacity reference scores match half rate.
+These are contest conventions, not LeanVM's query schedule.
 
 ## Four tracks
 
 Write delta for relative Hamming distance, a=1-delta for agreement, and B for
-an integer number of centibits. All profiles fix epsilon*=2^-128. Set t=256 for half rate and t=128 for quarter rate.
+an integer number of centibits. All profiles fix epsilon*=2^-128. Set t=128 for
+half rate and t=64 for quarter rate.
 
 A **soundness** entry proves:
 
@@ -84,8 +87,8 @@ end-to-end attacking prover.
 
 The bad-density exponent and the query score are different quantities. A
 count of roughly 2^137.83 in E gives density roughly 2^-54.17. At agreement
-17/32 it supports a 233.61-bit query-score ceiling, not a claim of 54-bit or
-233-bit end-to-end LeanVM security.
+17/32 it supports a 116.81-bit query-score ceiling, not a claim of 54-bit or
+116-bit end-to-end LeanVM security.
 
 If both sources are F-valued, every exceptional challenge above common
 agreement belongs to F, by coefficientwise projection on the independent
@@ -101,8 +104,8 @@ finite Lean certificates.
 
 | Rate | Unique-decoding agreement | Johnson agreement | Capacity agreement |
 |---|---:|---:|---:|
-| 1/2 | 3/4 (106.24 bits) | sqrt(1/2) (128 bits) | 1/2 (256 bits) |
-| 1/4 | 5/8 (86.79 bits) | 1/2 (128 bits) | 1/4 (256 bits) |
+| 1/2 | 3/4 (53.12 bits) | sqrt(1/2) (64 bits) | 1/2 (128 bits) |
+| 1/4 | 5/8 (43.39 bits) | 1/2 (64 bits) | 1/4 (128 bits) |
 
 See [initial bounds](initial-bounds.md) for the distinction between completed
 certificates and construction targets.

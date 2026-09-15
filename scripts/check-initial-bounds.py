@@ -35,7 +35,7 @@ def main():
         assert claim['unsafeIndex'] == n-threshold
         # Ceiling of -100*t*log2(agreement), checked using integers only.
         t = claim['repetitions']
-        assert t == (256 if claim['rate']=='half' else 128)
+        assert t == (128 if claim['rate']=='half' else 64)
         bits = claim['centibitsUpper']
         assert threshold**(100*t) * 2**bits >= n**(100*t)
         assert threshold**(100*t) * 2**(bits-1) < n**(100*t)

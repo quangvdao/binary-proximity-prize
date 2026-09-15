@@ -12,8 +12,8 @@
       "badCountLower": "309713815690513207162378190204953014251248",
       "formalizationStatus": "arithmetic-only; construction theorem not yet formalized",
       "primaryProfile": true,
-      "centibitsUpper": 23361,
-      "repetitions": 256
+      "centibitsUpper": 11681,
+      "repetitions": 128
     },
     {
       "id": "quarter-prefix21-height3",
@@ -25,8 +25,8 @@
       "badCountLower": "2419492655753785641587358791347024615469",
       "formalizationStatus": "arithmetic-only; construction theorem not yet formalized",
       "primaryProfile": true,
-      "centibitsUpper": 23425,
-      "repetitions": 128
+      "centibitsUpper": 11713,
+      "repetitions": 64
     },
     {
       "id": "half-prefix23-height2",
@@ -38,8 +38,8 @@
       "badCountLower": "24595617716531538599",
       "formalizationStatus": "arithmetic-only; construction theorem not yet formalized",
       "primaryProfile": false,
-      "centibitsUpper": 21250,
-      "repetitions": 256
+      "centibitsUpper": 10625,
+      "repetitions": 128
     }
   ],
   "reductionTarget": "2^-128"

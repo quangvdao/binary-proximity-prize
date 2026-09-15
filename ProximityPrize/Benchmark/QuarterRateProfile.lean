@@ -23,7 +23,7 @@ def totalDimension : Nat := 2 ^ 25
 def interleaving : Nat := 64
 def baseDimension : Nat := 2 ^ 19
 def domainSize : Nat := 2 ^ 21
-def repetitions : Nat := 128
+def repetitions : Nat := 64
 
 theorem card_index : Fintype.card Index = domainSize := by
   norm_num [Index, domainSize, BinaryDomain.card_index]
@@ -158,12 +158,12 @@ noncomputable def parameters :
 def merkleOpeningEstimateBits : Nat :=
   repetitions * (256 * 21 + 192 * interleaving)
 
-theorem merkleOpeningEstimateBits_eq : merkleOpeningEstimateBits = 2260992 := by
+theorem merkleOpeningEstimateBits_eq : merkleOpeningEstimateBits = 1130496 := by
   norm_num [merkleOpeningEstimateBits, repetitions, interleaving]
 
 def merkleOpeningEstimateBytes : Nat := merkleOpeningEstimateBits / 8
 
-theorem merkleOpeningEstimateBytes_eq : merkleOpeningEstimateBytes = 282624 := by
+theorem merkleOpeningEstimateBytes_eq : merkleOpeningEstimateBytes = 141312 := by
   norm_num [merkleOpeningEstimateBytes, merkleOpeningEstimateBits,
     repetitions, interleaving]
 
